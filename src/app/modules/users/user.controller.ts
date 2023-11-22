@@ -20,22 +20,22 @@ const createUser = async (req: Request, res: Response) => {
   }
 };
 
-// const getAllUsers = async (req: Request, res: Response) => {
-//   try {
-//     const result = await userServices.getAllUsers();
-//     res.status(200).json({
-//       status: 'success',
-//       message: 'User fetched successfully',
-//       data: result,
-//     });
-//   } catch (error: any) {
-//     console.log(error);
-//     res.status(500).json({
-//       status: 'fail',
-//       message: error.message || 'Something went wrong',
-//     });
-//   }
-// };
+const getAllUsers = async (req: Request, res: Response) => {
+  try {
+    const result = await UserServices.getAllUsers();
+    res.status(200).json({
+      status: true,
+      message: 'Users fetched successfully!',
+      data: result,
+    });
+  } catch (error: any) {
+    console.log(error);
+    res.status(500).json({
+      status: 'fail',
+      message: error.message || 'Something went wrong',
+    });
+  }
+};
 // const getSingleUser = async (req: Request, res: Response) => {
 //   try {
 //     const id = req.params.id;
@@ -90,4 +90,5 @@ const createUser = async (req: Request, res: Response) => {
 
 export const UserController = {
   createUser,
+  getAllUsers,
 };

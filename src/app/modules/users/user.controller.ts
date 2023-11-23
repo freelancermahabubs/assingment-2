@@ -1,13 +1,13 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { Request, Response } from 'express';
 import { UserServices } from './users.srvice';
 import UserSchemaValidation from './users.Validation';
-
+import { ZodError } from 'zod';
 const createUser = async (req: Request, res: Response) => {
   try {
     const userData = req.body;
     const zodParseData = UserSchemaValidation.parse(userData);
-  
+
     const newUser = await UserServices.createUserIntoDB(zodParseData);
     res.status(201).json({
       success: true,
@@ -15,10 +15,21 @@ const createUser = async (req: Request, res: Response) => {
       data: newUser,
     });
   } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: 'Internal Server Error',
-    });
+    if (error instanceof ZodError) {
+      // Handle Zod validation errors
+      res.status(400).json({
+        success: false,
+        message: 'Validation Error',
+        errors: error.errors,
+      });
+    } else {
+    
+      res.status(500).json({
+        success: false,
+        message: 'Internal Server Error',
+        error: error.message,
+      });
+    }
   }
 };
 

@@ -51,7 +51,7 @@ const getAllUsers = async (req: Request, res: Response) => {
 const getSingleUser = async (req: Request, res: Response) => {
   try {
     const userId = req.params.userId;
-    const user = await UserServices.getSingleUserFromDB(userId);
+    const user = await UserServices.getSingleUserFromDB(Number(userId));
     res.json({
       success: true,
       message: 'User fetched successfully!',
@@ -82,7 +82,7 @@ const updateUser = async (req: Request, res: Response) => {
     const updatedUserData: any = req.body;
     const updatedData = UserSchemaValidation.parse(updatedUserData);
     const updatedUser = await UserServices.updateUserIntoDB(
-      userId,
+      Number(userId),
       updatedData,
     );
     res.json({
@@ -111,7 +111,7 @@ const updateUser = async (req: Request, res: Response) => {
 const deleteUser = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
-    await UserServices.deleteStudentsFromDB(userId);
+    await UserServices.deleteStudentsFromDB(Number(userId));
     res.status(200).json({
       success: true,
       message: 'User deleted successfully!',
@@ -142,7 +142,7 @@ const addProductToOrder = async (req: Request, res: Response) => {
     const userId = req.params.userId;
     const productData = req.body;
 
-    await UserServices.addProductToOrder(userId, productData);
+    await UserServices.addProductToOrder(Number(userId), productData);
 
     res.json({
       success: true,
@@ -173,7 +173,7 @@ const addProductToOrder = async (req: Request, res: Response) => {
 const getUserOrders = async (req: Request, res: Response) => {
   try {
     const userId = req.params.userId;
-    const orders = await UserServices.getUserOrdersFromDB(userId);
+    const orders = await UserServices.getUserOrdersFromDB(Number(userId));
 
     if (!orders) {
       return res.status(404).json({
@@ -206,7 +206,7 @@ const getUserOrders = async (req: Request, res: Response) => {
 const getTotalPrice = async (req: Request, res: Response) => {
   try {
     const userId = req.params.userId;
-    const totalPrice: number = await UserServices.calculateTotalPrice(userId);
+    const totalPrice: number = await UserServices.calculateTotalPrice(Number(userId));
 
     res.json({
       success: true,

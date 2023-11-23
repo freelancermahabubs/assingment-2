@@ -1,4 +1,4 @@
-import { User } from './users.Interface';
+
 import { UserModel } from './users.Model';
 
 const createUserIntoDB = async (userData: any) => {
@@ -10,7 +10,7 @@ const createUserIntoDB = async (userData: any) => {
 };
 
 const getAllUsersFromDB = async () => {
-  const users = await UserModel.find({});
+  const users = await UserModel.find({}, 'username fullName age email address');
 
   const sanitizedUsers = users.map(user => sanitizeUser(user.toObject()));
 

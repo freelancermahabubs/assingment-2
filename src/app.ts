@@ -8,7 +8,7 @@ const app: Application = express();
 app.use(express.json());
 app.use(cors());
 // application Routes
-app.use('/api', UsersRoutes);
+app.use('/api/users', UsersRoutes);
 const getAController = (req: Request, res: Response) => {
   res.send('Hello Server!');
 };

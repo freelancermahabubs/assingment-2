@@ -5,7 +5,7 @@ import { UserServices } from './users.srvice';
 const createUser = async (req: Request, res: Response) => {
   try {
     const userData = req.body;
-    const result = await UserServices.createUser(userData);
+    const result = await UserServices.createUserIntoDB(userData);
     res.status(201).json({
       success: true,
       message: 'User created successfully!',
@@ -22,9 +22,9 @@ const createUser = async (req: Request, res: Response) => {
 
 const getAllUsers = async (req: Request, res: Response) => {
   try {
-    const result = await UserServices.getAllUsers();
+    const result = await UserServices.getAllUsersFromDB();
     res.status(200).json({
-      status: true,
+      success: true,
       message: 'Users fetched successfully!',
       data: result,
     });
@@ -36,59 +36,96 @@ const getAllUsers = async (req: Request, res: Response) => {
     });
   }
 };
-// const getSingleUser = async (req: Request, res: Response) => {
-//   try {
-//     const id = req.params.id;
-//     const result = await userServices.getSingleUser(id);
-//     res.status(200).json({
-//       status: 'success',
-//       message: 'Single User fetched successfully',
-//       data: result,
-//     });
-//   } catch (error: any) {
-//     console.log(error);
-//     res.status(500).json({
-//       status: 'fail',
-//       message: error.message || 'Something went wrong',
-//     });
-//   }
-// };
-// const updateUser = async (req: Request, res: Response) => {
-//   try {
-//     const userData = req.body;
-//     const id = req.params.id;
-//     const result = await userServices.updateUser(id, userData);
-//     res.status(200).json({
-//       status: 'success',
-//       message: 'User updated successfully',
-//       data: result,
-//     });
-//   } catch (error: any) {
-//     console.log(error);
-//     res.status(500).json({
-//       status: 'fail',
-//       message: error.message || 'Something went wrong',
-//     });
-//   }
-// };
-// const deleteUser = async (req: Request, res: Response) => {
-//   try {
-//     const id = req.params.id;
-//     await userServices.deleteUser(id);
-//     res.status(200).json({
-//       status: 'success',
-//       message: 'User deleted successfully',
-//     });
-//   } catch (error: any) {
-//     console.log(error);
-//     res.status(500).json({
-//       status: 'fail',
-//       message: error.message || 'Something went wrong',
-//     });
-//   }
-// };
+
+const getSingleUser = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id;
+    const result = await UserServices.getSingleUserFromDB(id);
+    res.status(200).json({
+      success: true,
+      message: 'Single User fetched successfully',
+      data: result,
+    });
+  } catch (error: any) {
+    res.status(404).json({
+      success: false,
+      message: 'User not found',
+      error: error.message,
+    });
+  }
+};
+
+const updateUser = async (req: Request, res: Response) => {
+  try {
+    const userData = req.body;
+    const id = req.params.id;
+    const result = await UserServices.updateUserIntoDB(id, userData);
+    res.status(200).json({
+      succes: true,
+      message: 'User updated successfully',
+      data: result,
+    });
+  } catch (error: any) {
+    console.log(error);
+    res.status(500).json({
+      status: 'fail',
+      message: error.message || 'Something went wrong',
+    });
+  }
+};
+const deleteUser = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const result = await UserServices.deleteStudentsFromDB(id);
+    res.status(200).json({
+      success: true,
+      message: 'User deleted successfully!',
+      data: result,
+    });
+  } catch (error: any) {
+    res.status(404).json({
+      success: false,
+      message: 'User not found',
+      error: error.message,
+    });
+  }
+};
+
+// get order
+
+const getUserOrders = async (req: Request, res: Response) => {
+  try {
+    const userId = req.params.userId;
+    const orders = await UserServices.getUserOrdersFromDB(userId);
+
+    if (!orders) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found!',
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Orders fetched successfully!',
+      data: {
+        orders,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal Server Error',
+    });
+  }
+};
 
 export const UserController = {
   createUser,
   getAllUsers,
+  getSingleUser,
+  deleteUser,
+  updateUser,
+  getUserOrders,
 };

@@ -28,4 +28,4 @@ const UserSchemaValidation = object({
   orders: array(OrderSchemaValidation).default([]),
 });
 
-export default UserSchemaValidation
+export default UserSchemaValidation;

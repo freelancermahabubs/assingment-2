@@ -28,9 +28,8 @@ const getAllUsers = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (error: any) {
-
     res.status(500).json({
-      status: 'fail',
+      success: false,
       message: error.message || 'Something went wrong',
     });
   }
@@ -38,54 +37,87 @@ const getAllUsers = async (req: Request, res: Response) => {
 
 const getSingleUser = async (req: Request, res: Response) => {
   try {
-    const id = req.params.id;
-    const result = await UserServices.getSingleUserFromDB(id);
-    res.status(200).json({
+    const userId = req.params.userId;
+    const user = await UserServices.getSingleUserFromDB(userId);
+    res.json({
       success: true,
-      message: 'Single User fetched successfully',
-      data: result,
+      message: 'User fetched successfully!',
+      data: user,
     });
   } catch (error: any) {
-    res.status(404).json({
+    if (error.statusCode === 404) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+        error: {
+          code: 404,
+          description: 'User not found!',
+        },
+      });
+    }
+
+    res.status(500).json({
       success: false,
-      message: 'User not found',
-      error: error.message,
+      message: 'Internal Server Error',
     });
   }
 };
 
 const updateUser = async (req: Request, res: Response) => {
   try {
-    const userData = req.body;
-    const id = req.params.id;
-    const result = await UserServices.updateUserIntoDB(id, userData);
-    res.status(200).json({
-      succes: true,
-      message: 'User updated successfully',
-      data: result,
+    const userId = req.params.userId;
+    const updatedUserData: any = req.body;
+    const updatedUser = await UserServices.updateUserIntoDB(
+      userId,
+      updatedUserData,
+    );
+    res.json({
+      success: true,
+      message: 'User updated successfully!',
+      data: updatedUser,
     });
   } catch (error: any) {
+    if (error.statusCode === 404) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+        error: {
+          code: 404,
+          description: 'User not found!',
+        },
+      });
+    }
 
     res.status(500).json({
-      status: 'fail',
-      message: error.message || 'Something went wrong',
+      success: false,
+      message: 'Internal Server Error',
     });
   }
 };
 const deleteUser = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
-    const result = await UserServices.deleteStudentsFromDB(id);
+    const { userId } = req.params;
+    await UserServices.deleteStudentsFromDB(userId);
     res.status(200).json({
       success: true,
       message: 'User deleted successfully!',
-      data: result,
+      data: null,
     });
   } catch (error: any) {
-    res.status(404).json({
+    if (error.statusCode === 404) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+        error: {
+          code: 404,
+          description: 'User not found!',
+        },
+      });
+    }
+
+    res.status(500).json({
       success: false,
-      message: 'User not found',
-      error: error.message,
+      message: 'Internal Server Error',
     });
   }
 };
@@ -102,7 +134,7 @@ const addProductToOrder = async (req: Request, res: Response) => {
     res.json({
       success: true,
       message: 'Order created successfully!',
-      data: updatedOrders,
+      data: null,
     });
   } catch (error: any) {
     if (error.statusCode === 404) {

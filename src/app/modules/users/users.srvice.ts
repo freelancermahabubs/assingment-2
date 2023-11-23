@@ -1,47 +1,66 @@
-
 import { User } from './users.Interface';
 import { UserModel } from './users.Model';
 
 const createUserIntoDB = async (userData: any) => {
-try {
-    const user: UserDocument = await UserModel.create(userData);
+  const user = await UserModel.create(userData);
 
-    // Exclude sensitive information (e.g., password) from the user object
-    const sanitizedUser = sanitizeUser(user.toObject());
+  const { password, ...sanitizedUser } = user.toObject();
 
-    return sanitizedUser;
-  } catch (error) {
-    throw error;
-  }
-};
-
-const sanitizeUser = (userObject: any): any => {
-  // Remove sensitive information (e.g., password) from the user object
-  const { password, ...sanitizedUser } = userObject;
   return sanitizedUser;
 };
 
 const getAllUsersFromDB = async () => {
-  const result = await UserModel.find();
-  return result;
-};
-const getSingleUserFromDB = async (id: string) => {
-  const result = await UserModel.findById(id);
-  return result;
+  const users = await UserModel.find({});
+
+  const sanitizedUsers = users.map(user => sanitizeUser(user.toObject()));
+
+  return sanitizedUsers;
 };
 
-const updateUserIntoDB = async (id: string, userData: User) => {
-  const result = await UserModel.findByIdAndUpdate(id, userData, {
+const sanitizeUser = (userObject: any) => {
+  const { password, ...sanitizedUser } = userObject;
+  return sanitizedUser;
+};
+
+const getSingleUserFromDB = async (userId: number) => {
+  const user = await UserModel.findOne({ userId }, '-password');
+
+  if (!user) {
+    const error = new Error('User not found') as any;
+    error.statusCode = 404;
+    throw error;
+  }
+
+  const sanitizedUser = sanitizeUser(user.toObject());
+  return sanitizedUser;
+};
+
+const updateUserIntoDB = async (userId: number, updatedUserData: any) => {
+  const user = await UserModel.findOneAndUpdate({ userId }, updatedUserData, {
     new: true,
     runValidators: true,
+    select: '-password',
   });
 
-  return result;
+  if (!user) {
+    const error = new Error('User not found') as any;
+    error.statusCode = 404;
+    throw error;
+  }
+
+  const sanitizedUser = sanitizeUser(user.toObject());
+  return sanitizedUser;
 };
 
-const deleteStudentsFromDB = async (id: string) => {
-  const result = await UserModel.findByIdAndDelete(id);
-  return result;
+const deleteStudentsFromDB = async (userId: number) => {
+  const user = await UserModel.findOneAndDelete({ userId });
+
+  if (!user) {
+    const error = new Error('User not found') as any;
+    error.statusCode = 404;
+    throw error;
+  }
+  return user;
 };
 
 // add to order db

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { Request, Response } from 'express';
 import { UserServices } from './users.srvice';
@@ -16,14 +17,12 @@ const createUser = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     if (error instanceof ZodError) {
-      // Handle Zod validation errors
       res.status(400).json({
         success: false,
         message: 'Validation Error',
         errors: error.errors,
       });
     } else {
-    
       res.status(500).json({
         success: false,
         message: 'Internal Server Error',
@@ -81,9 +80,10 @@ const updateUser = async (req: Request, res: Response) => {
   try {
     const userId = req.params.userId;
     const updatedUserData: any = req.body;
+    const updatedData = UserSchemaValidation.parse(updatedUserData);
     const updatedUser = await UserServices.updateUserIntoDB(
       userId,
-      updatedUserData,
+      updatedData,
     );
     res.json({
       success: true,
@@ -136,10 +136,12 @@ const deleteUser = async (req: Request, res: Response) => {
   }
 };
 
+// add Order
 const addProductToOrder = async (req: Request, res: Response) => {
   try {
     const userId = req.params.userId;
     const productData = req.body;
+
     await UserServices.addProductToOrder(userId, productData);
 
     res.json({

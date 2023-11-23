@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
 import { UserModel } from './users.Model';
 
@@ -104,11 +106,14 @@ const calculateTotalPrice = async (userId: number): Promise<number> => {
     throw error;
   }
 
-  const totalPrice: number =
-    user.orders?.reduce(
-      (acc, order) => acc + order.price * order.quantity,
-      0,
-    ) || 0;
+  const totalPrice: number = parseFloat(
+    (
+      user.orders?.reduce(
+        (acc, order) => acc + order.price * order.quantity,
+        0,
+      ) || 0
+    ).toFixed(2),
+  );
   return totalPrice;
 };
 export const UserServices = {

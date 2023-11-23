@@ -91,6 +91,36 @@ const deleteUser = async (req: Request, res: Response) => {
   }
 };
 
+const addProductToOrder = async (req: Request, res: Response) => {
+  try {
+    const userId = req.params.userId;
+    const productData = req.body;
+    const updatedOrders = await UserServices.addProductToOrder(
+      userId,
+      productData,
+    );
+
+    res.json({
+      success: true,
+      message: 'Order created successfully!',
+      data: updatedOrders,
+    });
+  } catch (error: any) {
+    if (error.message === 'User not found') {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found!',
+      });
+    }
+
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal Server Error',
+    });
+  }
+};
+
 // get order
 
 const getUserOrders = async (req: Request, res: Response) => {
@@ -128,4 +158,5 @@ export const UserController = {
   deleteUser,
   updateUser,
   getUserOrders,
+  addProductToOrder,
 };

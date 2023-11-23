@@ -29,6 +29,25 @@ const deleteStudentsFromDB = async (id: string) => {
   return result;
 };
 
+// add to order db
+
+const addProductToOrder = async (userId: number, productData: any) => {
+  const user = await UserModel.findOne({ userId });
+
+  if (!user) {
+    throw new Error('User not found');
+  }
+
+  if (!user.orders) {
+    user.orders = [];
+  }
+
+  user.orders.push(productData);
+  await user.save();
+
+  return user.orders;
+};
+// get all orders
 const getUserOrdersFromDB = async (userId: number) => {
   const user = await UserModel.findOne({ userId });
   return user ? user.orders : null;
@@ -41,4 +60,5 @@ export const UserServices = {
   deleteStudentsFromDB,
   updateUserIntoDB,
   getUserOrdersFromDB,
+  addProductToOrder,
 };

@@ -1,9 +1,24 @@
+
 import { User } from './users.Interface';
 import { UserModel } from './users.Model';
 
-const createUserIntoDB = async (userData: User) => {
-  const result = await UserModel.create(userData);
-  return result;
+const createUserIntoDB = async (userData: any) => {
+try {
+    const user: UserDocument = await UserModel.create(userData);
+
+    // Exclude sensitive information (e.g., password) from the user object
+    const sanitizedUser = sanitizeUser(user.toObject());
+
+    return sanitizedUser;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const sanitizeUser = (userObject: any): any => {
+  // Remove sensitive information (e.g., password) from the user object
+  const { password, ...sanitizedUser } = userObject;
+  return sanitizedUser;
 };
 
 const getAllUsersFromDB = async () => {
@@ -35,7 +50,9 @@ const addProductToOrder = async (userId: number, productData: any) => {
   const user = await UserModel.findOne({ userId });
 
   if (!user) {
-    throw new Error('User not found');
+    const error = new Error('User not found') as any;
+    error.statusCode = 404;
+    throw error;
   }
 
   if (!user.orders) {
@@ -50,19 +67,27 @@ const addProductToOrder = async (userId: number, productData: any) => {
 // get all orders
 const getUserOrdersFromDB = async (userId: number) => {
   const user = await UserModel.findOne({ userId });
+
+  if (!user) {
+    const error = new Error('User not found') as any;
+    error.statusCode = 404;
+    throw error;
+  }
   return user ? user.orders : null;
 };
 
 const calculateTotalPrice = async (userId: number): Promise<number> => {
-  const user: UserDocument | null = await UserModel.findOne({userId});
+  const user = await UserModel.findOne({ userId });
 
   if (!user) {
-    throw new Error('User not found');
+    const error = new Error('User not found') as any;
+    error.statusCode = 404;
+    throw error;
   }
 
   const totalPrice: number =
     user.orders?.reduce(
-      (acc: number, order: number) => acc + order.price * order.quantity,
+      (acc, order) => acc + order.price * order.quantity,
       0,
     ) || 0;
   return totalPrice;

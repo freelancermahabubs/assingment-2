@@ -5,17 +5,16 @@ import { UserServices } from './users.srvice';
 const createUser = async (req: Request, res: Response) => {
   try {
     const userData = req.body;
-    const result = await UserServices.createUserIntoDB(userData);
-    res.status(201).json({
+    const newUser = await UserServices.createUserIntoDB(userData);
+    res.json({
       success: true,
       message: 'User created successfully!',
-      data: result,
+      data: newUser,
     });
   } catch (error: any) {
-    console.log(error);
     res.status(500).json({
-      status: 'fail',
-      message: error.message || 'Something went wrong',
+      success: false,
+      message: 'Internal Server Error',
     });
   }
 };
@@ -29,7 +28,7 @@ const getAllUsers = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (error: any) {
-    console.log(error);
+
     res.status(500).json({
       status: 'fail',
       message: error.message || 'Something went wrong',
@@ -66,7 +65,7 @@ const updateUser = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (error: any) {
-    console.log(error);
+
     res.status(500).json({
       status: 'fail',
       message: error.message || 'Something went wrong',
@@ -106,14 +105,17 @@ const addProductToOrder = async (req: Request, res: Response) => {
       data: updatedOrders,
     });
   } catch (error: any) {
-    if (error.message === 'User not found') {
+    if (error.statusCode === 404) {
       return res.status(404).json({
         success: false,
-        message: 'User not found!',
+        message: 'User not found',
+        error: {
+          code: 404,
+          description: 'User not found!',
+        },
       });
     }
 
-    console.error(error);
     res.status(500).json({
       success: false,
       message: 'Internal Server Error',
@@ -142,12 +144,17 @@ const getUserOrders = async (req: Request, res: Response) => {
         orders,
       },
     });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      success: false,
-      message: 'Internal Server Error',
-    });
+  } catch (error: any) {
+    if (error.statusCode === 404) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+        error: {
+          code: 404,
+          description: 'User not found!',
+        },
+      });
+    }
   }
 };
 
@@ -164,14 +171,17 @@ const getTotalPrice = async (req: Request, res: Response) => {
       },
     });
   } catch (error: any) {
-    if (error.message === 'User not found') {
+    if (error.statusCode === 404) {
       return res.status(404).json({
         success: false,
-        message: 'User not found!',
+        message: 'User not found',
+        error: {
+          code: 404,
+          description: 'User not found!',
+        },
       });
     }
 
-    console.error(error);
     res.status(500).json({
       success: false,
       message: 'Internal Server Error',

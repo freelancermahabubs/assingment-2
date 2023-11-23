@@ -12,3 +12,6 @@
 ### 8.  Calculate Total Price of Orders for a Specific User
 ### 9.  Use zod to validate incoming data for user and order creation and updating operations.
 
+# LIVE Site URL: 
+https://assingment-2-ashy.vercel.app/
+
